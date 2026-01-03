@@ -5,9 +5,10 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
-import { useAuthStore } from "./store/useAuthstore";
+import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
 import { LoaderCircleIcon } from "lucide-react";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -27,6 +28,7 @@ const App = () => {
 
   return (
     <div>
+      <Toaster position="top-right" />
       <Navbar />
       <Routes>
         <Route
@@ -45,10 +47,7 @@ const App = () => {
           path="/profile"
           element={authUser ? <Profile /> : <Navigate to="/login" />}
         />
-        <Route
-          path="/settings"
-          element={authUser ? <Settings /> : <Navigate to="/login" />}
-        />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </div>
   );
