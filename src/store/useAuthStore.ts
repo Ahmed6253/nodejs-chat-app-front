@@ -3,7 +3,13 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 
 interface AuthStore {
-  authUser: Object | null;
+  authUser: {
+    id: string;
+    fullName: string;
+    email: string;
+    profilePic: string;
+    createdAt: string;
+  } | null;
   isSigningUp: boolean;
   isLoggingIn: boolean;
   isUpdatingProfile: boolean;
@@ -12,6 +18,7 @@ interface AuthStore {
   signup: (data: any) => void;
   logout: () => void;
   login: (data: any) => void;
+  updateProfile: (data: any) => void;
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
@@ -41,7 +48,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       toast.success("Account created successfully");
     } catch (error: any) {
       set({ authUser: null });
-      toast.error(error.response.data.message || "Something went wrong");
+      toast.error(error.response.data.messages || "Something went wrong");
     } finally {
       set({ isSigningUp: false });
     }
@@ -64,9 +71,31 @@ export const useAuthStore = create<AuthStore>((set) => ({
       toast.success("Logged in successfully");
     } catch (error: any) {
       set({ authUser: null });
-      toast.error(error.response.data.message || "Something went wrong");
+
+      toast.error(error.response.data.messages || "Something went wrong");
     } finally {
       set({ isLoggingIn: false });
+    }
+  },
+  updateProfile: async (data: any) => {
+    set({ isUpdatingProfile: true });
+    try {
+      const res = await axiosInstance.put("/auth/update-profile", data);
+      set((state) => ({
+        authUser: state.authUser
+          ? { ...state.authUser, profilePic: res.data }
+          : null,
+      }));
+      toast.success("Profile updated successfully");
+    } catch (error: any) {
+      console.log(error.response);
+
+      if (error.response?.status === 413) {
+        return toast.error("Image size is too large");
+      }
+      toast.error(error.response?.data?.messages || "Something went wrong");
+    } finally {
+      set({ isUpdatingProfile: false });
     }
   },
 }));
