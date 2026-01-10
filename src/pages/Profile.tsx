@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Camera, Mail, User } from "lucide-react";
+import { fileSizeCheck } from "../lib/fileSizeCheck";
+import toast from "react-hot-toast";
 
 const Profile = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
@@ -11,6 +13,10 @@ const Profile = () => {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e?.target?.files?.[0];
     if (!file) return;
+
+    if (fileSizeCheck(file) === false)
+      return toast.error("Image size is too large");
+    else console.log(file.size);
 
     const reader = new FileReader();
 

@@ -79,6 +79,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
   updateProfile: async (data: any) => {
     set({ isUpdatingProfile: true });
+
     try {
       const res = await axiosInstance.put("/auth/update-profile", data);
       set((state) => ({
@@ -88,8 +89,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
       }));
       toast.success("Profile updated successfully");
     } catch (error: any) {
-      console.log(error.response);
-
       if (error.response?.status === 413) {
         return toast.error("Image size is too large");
       }
