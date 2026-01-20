@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 
 interface AuthStore {
   authUser: {
-    id: string;
+    _id: string;
     fullName: string;
     email: string;
     profilePic: string;

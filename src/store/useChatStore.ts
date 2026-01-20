@@ -4,17 +4,21 @@ import { axiosInstance } from "../lib/axios";
 // import { useAuthStore } from "./useAuthStore";
 
 interface ChatStore {
-  messages: string[];
+  messages: any[];
   users: [];
   selectedUser: {
     _id: string;
+    fullName: string;
+    email: string;
+    profilePic: string;
+    createdAt: string;
   } | null;
   isUsersLoading: boolean;
   isMessagesLoading: boolean;
-  sendMessage: (messageData: { message: string }) => Promise<void>;
+  sendMessage: (messageData:  { text: string; image: string  }) => Promise<void>;
   getMessages: (userId: string) => Promise<void>;
   getUsers: () => Promise<void>;
-  setSelectedUser: (selectedUser: { _id: string }) => void;
+  setSelectedUser: (selectedUser: { _id: string } | null) => void;
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -47,7 +51,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       set({ isMessagesLoading: false });
     }
   },
-  sendMessage: async (messageData) => {
+  sendMessage: async (messageData ) => {
     const { selectedUser, messages } = get();
     try {
       const res = await axiosInstance.post(
@@ -81,5 +85,5 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   //     socket.off("newMessage");
   //   },
 
-  setSelectedUser: (selectedUser) => set({ selectedUser }),
+  setSelectedUser: (selectedUser : any | null) =>  set({ selectedUser } ),
 }));
