@@ -4,15 +4,17 @@ import { axiosInstance } from "../lib/axios";
 // import { useAuthStore } from "./useAuthStore";
 
 interface ChatStore {
-  messages: any[];
-  users: any[];
-  selectedUser: any;
+  messages: string[];
+  users: [];
+  selectedUser: {
+    _id: string;
+  } | null;
   isUsersLoading: boolean;
   isMessagesLoading: boolean;
-  sendMessage: (messageData: any) => Promise<void>;
+  sendMessage: (messageData: { message: string }) => Promise<void>;
   getMessages: (userId: string) => Promise<void>;
   getUsers: () => Promise<void>;
-  setSelectedUser: (selectedUser: any) => void;
+  setSelectedUser: (selectedUser: { _id: string }) => void;
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -39,21 +41,21 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     try {
       const res = await axiosInstance.get(`/messages/${userId}`);
       set({ messages: res.data });
-    } catch (error: any) {
+    } catch (error : any) {
       toast.error(error.response.data.message);
     } finally {
       set({ isMessagesLoading: false });
     }
   },
-  sendMessage: async (messageData: any) => {
-    const { selectedUser, messages }: any = get();
+  sendMessage: async (messageData) => {
+    const { selectedUser, messages } = get();
     try {
       const res = await axiosInstance.post(
-        `/messages/send/${selectedUser._id}`,
-        messageData
+        `/messages/send/${selectedUser?._id}`,
+        messageData,
       );
       set({ messages: [...messages, res.data] });
-    } catch (error: any) {
+    } catch (error :any) {
       toast.error(error.response.data.message);
     }
   },
@@ -79,5 +81,5 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   //     socket.off("newMessage");
   //   },
 
-    setSelectedUser: (selectedUser: any) => set({ selectedUser }),
+  setSelectedUser: (selectedUser) => set({ selectedUser }),
 }));

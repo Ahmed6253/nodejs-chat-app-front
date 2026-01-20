@@ -7,6 +7,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
   globalIgnores(['dist']),
+ ,
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -19,5 +20,8 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      "@typescript-eslint/no-explicit-any": ["error", { ignoreRestArgs: true }],
+    }
   },
 ])
