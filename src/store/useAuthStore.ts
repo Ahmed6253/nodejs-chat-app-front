@@ -1,9 +1,9 @@
 import { create } from "zustand";
-import { axiosInstance } from "../lib/axios";
+import { axiosInstance, BASE_URL } from "../lib/axios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const BASE_URL = "http://localhost:5001";
+
 
 
 interface AuthStore {
@@ -26,6 +26,7 @@ interface AuthStore {
   updateProfile: (data: any) => void;
   connectSocket: () => void;
   disconnectSocket: () => void;
+  onlineUsers: string[]
 }
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
@@ -35,6 +36,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   isLoggingIn: false,
   isUpdatingProfile: false,
   isCheckingAuth: true,
+  onlineUsers: [],
 
   checkAuth: async () => {
     try {
@@ -81,7 +83,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       get().connectSocket();
     } catch (error: any) {
       set({ authUser: null });
-      toast.error(error.response?.data?.message || "Something went wrong");
+      toast.error(error.response?.data?.messages || "Something went wrong");
     } finally {
       set({ isLoggingIn: false });
     }
@@ -111,9 +113,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     const {authUser} = get();
     if(!authUser?._id || get().socket?.connected) return;
     
-    const socket = io(BASE_URL);
+    const socket = io(BASE_URL, {
+      query: {
+        userId: authUser._id,
+      },
+    });
     socket.connect();
     set({ socket });
+
+    socket.on("getOnlineUsers", (onlineUsers : string[] ) => {
+      set({ onlineUsers });
+    });
 
   },
   disconnectSocket: ()=>{
